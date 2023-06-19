@@ -1,13 +1,8 @@
 from pysmt.smtlib.parser import SmtLibParser
-
+from parser import Parser
 smt_parser = SmtLibParser()
 
-from parser import Parser
-
-file_path = "inputs/input1.smt2"
+file_path = "inputs/input3.smt2"
 p = Parser(path=file_path)
-f_p, f_n = p.parse()
-
-for f in f_p:
-    si, ti = [_.strip() for _ in f.split('=')]
-    print(si)
+parsed = p.parse()
+print(parsed)
