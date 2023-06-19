@@ -1,0 +1,2 @@
+PySMT==0.9.5
+sympy
