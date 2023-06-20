@@ -1,8 +1,13 @@
-from pysmt.smtlib.parser import SmtLibParser
 from parser import Parser
-smt_parser = SmtLibParser()
+from utils import get_positive_negative_subsets
 
-file_path = "inputs/eq_diamond2.smt2"
-p = Parser(path=file_path)
-parsed = p.parse()
-print(parsed)
+
+def main():
+    file_path = "inputs/input1.smt2"
+    dnf_expr, nodes, dict_created_formulas = Parser(path=file_path).parse()
+    f_plus, f_minus = get_positive_negative_subsets(dnf_expr)
+
+
+
+if __name__ == '__main__':
+    main()

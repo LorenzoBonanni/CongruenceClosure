@@ -1,21 +1,35 @@
 import re
+from dataclasses import dataclass
 
+import networkx as nx
 from pysmt.smtlib.parser import SmtLibParser
-from sympy import parse_expr, to_dnf
+from sympy import parse_expr
+from sympy.core.function import Function
 from sympy.core.relational import Equality, Unequality
-from sympy.logic.boolalg import Or, And, to_cnf
+from sympy.core.symbol import Symbol
+from sympy.logic.boolalg import *
+
+from utils import plot_nodes
+
+
+@dataclass
+class Node:
+    node_id: int
+    fn: str
+    args: list
+    find_id: int
+    ccpar: list
+
+    def __post_init__(self):
+        if len(self.ccpar) != 0:
+            self.find_id = self.node_id
 
 
 class Parser:
     def __init__(self, path: str):
         self.smt_parser = SmtLibParser()
         self.script = self.smt_parser.get_script_fname(path)
-        self.op2str = {
-            Or: ' | ',
-            And: ' & ',
-            Equality: ' == ',
-            Unequality: ' != '
-        }
+        self.id_to_node = {}
 
     def replace_ineq(self, text):
         idx_negative = re.finditer('!', text)
@@ -33,15 +47,36 @@ class Parser:
         expr = expr.replace(' = ', ' == ')
         return expr
 
-    def to_string(self, root):
-        if isinstance(root, Or):
-            return "(" + self.op2str[Or].join(self.to_string(arg) for arg in root.args) + ")"
-        elif isinstance(root, And):
-            return "(" + self.op2str[And].join(self.to_string(arg) for arg in root.args) + ")"
-        elif isinstance(root, (Equality, Unequality)):
-            return "(" + self.to_string(root.args[0]) + self.op2str[type(root)] + self.to_string(root.args[1]) + ")"
-        else:
-            return str(root)
+    def generate_dag(self, atoms):
+        dict_created_formulas = {}
+        counter = 0
+
+        # Initialize a counter for node_ids
+        atoms = sorted([(a, str(a)) for a in atoms], key=lambda x: len(x[1]))
+        for atom, full_str in atoms:
+            str_atom = atom.name
+            args = atom.args
+            if dict_created_formulas.get(full_str, None) is None:
+                # Increment the counter before creating a node
+                counter += 1
+                node = Node(node_id=counter, fn=str_atom, find_id=counter, args=[], ccpar=[])
+                self.id_to_node[counter] = node
+                dict_created_formulas[full_str] = node
+                if len(args) > 0:
+                    for arg in args:
+                        child = dict_created_formulas[str(arg)]
+                        node.args.append(child.node_id)
+        return dict_created_formulas
+
+    def build_dag(self, nodes):
+
+
+        return G
+
+    def populate_ccpar(self, nodes):
+        for node in nodes:
+            for arg in node.args:
+                self.id_to_node[arg].ccpar.append(node.node_id)
 
     def parse(self):
         expr = self.script.get_strict_formula().serialize()
@@ -50,6 +85,11 @@ class Parser:
         expr = parse_expr(expr, evaluate=False)
         print(f"INPUT EXPRESSION:\n{expr}")
         dnf_expr = to_cnf(expr)
+        atoms = dnf_expr.atoms(Function, Symbol)
+        dict_created_formulas = self.generate_dag(atoms)
+        nodes = list(self.id_to_node.values())
+        self.populate_ccpar(nodes)
+        plot_nodes(self.id_to_node)
         print(f"DNF EXPRESSION:\n{dnf_expr}")
-        out = self.to_string(dnf_expr)
-        return out
+
+        return dnf_expr, nodes, dict_created_formulas
