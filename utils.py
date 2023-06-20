@@ -4,16 +4,17 @@ from matplotlib import pyplot as plt
 from sympy.core.relational import Equality, Unequality
 
 
-def get_positive_negative_subsets(equation):
+def get_positive_negative_subsets(equation, dict_created_formulas):
     equalities = equation.atoms(Equality, Unequality)
     equalities = list(equalities)
     f_plus = []
     f_minus = []
     for eq in equalities:
+        arguments = [dict_created_formulas[str(arg)].node_id for arg in eq.args]
         if type(eq) is Equality:
-            f_plus.append(eq)
+            f_plus.append(arguments)
         else:
-            f_minus.append(eq)
+            f_minus.append(arguments)
     return f_plus, f_minus
 
 

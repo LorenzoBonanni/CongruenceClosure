@@ -68,11 +68,6 @@ class Parser:
                         node.args.append(child.node_id)
         return dict_created_formulas
 
-    def build_dag(self, nodes):
-
-
-        return G
-
     def populate_ccpar(self, nodes):
         for node in nodes:
             for arg in node.args:
