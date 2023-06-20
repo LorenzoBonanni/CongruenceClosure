@@ -1,2 +1,4 @@
 PySMT==0.9.5
-sympy
+sympy~=1.12
+networkx~=3.1
+graphviz~=0.20.1
