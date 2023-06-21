@@ -11,19 +11,19 @@ class CongruenceClosureAlgorithm:
         n = self.id_to_node[id1]
         if id1 == n.find_id:
             return id1
-        else:
-            return self.find(n.find_id)
+        return self.find(n.find_id)
 
     def union(self, id1, id2):
         n1 = self.id_to_node[self.find(id1)]
         n2 = self.id_to_node[self.find(id2)]
         n1.find_id = n2.find_id
+        # delete the one with largest ccpar
         if len(n1.ccpar) < len(n2.ccpar):
-            n2.ccpar = n1.ccpar + n2.ccpar
-            n1.ccpar = []
+            n1.ccpar = n1.ccpar.union(n2.ccpar)
+            n2.ccpar = set()
         else:
-            n1.ccpar = n1.ccpar + n2.ccpar
-            n2.ccpar = []
+            n2.ccpar = n1.ccpar.union(n2.ccpar)
+            n1.ccpar = set()
 
     def ccpar(self, id1):
         return self.id_to_node[self.find(id1)].ccpar
@@ -37,9 +37,9 @@ class CongruenceClosureAlgorithm:
 
     def merge(self, id1: int, id2: int):
         if self.find(id1) != self.find(id2):
-            self.union(id1, id2)
             p1 = self.ccpar(id1)
             p2 = self.ccpar(id2)
+            self.union(id1, id2)
             for t1, t2 in itertools.product(p1, p2):
                 if self.find(t1) != self.find(t2) and self.congruent(t1, t2):
                     self.merge(t1, t2)

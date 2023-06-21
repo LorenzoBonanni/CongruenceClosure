@@ -18,7 +18,7 @@ class Node:
     fn: str
     args: list
     find_id: int
-    ccpar: list
+    ccpar: set
 
     def __post_init__(self):
         if len(self.ccpar) != 0:
@@ -59,7 +59,7 @@ class Parser:
             if dict_created_formulas.get(full_str, None) is None:
                 # Increment the counter before creating a node
                 counter += 1
-                node = Node(node_id=counter, fn=str_atom, find_id=counter, args=[], ccpar=[])
+                node = Node(node_id=counter, fn=str_atom, find_id=counter, args=[], ccpar=set())
                 self.id_to_node[counter] = node
                 dict_created_formulas[full_str] = node
                 if len(args) > 0:
@@ -71,7 +71,7 @@ class Parser:
     def populate_ccpar(self, nodes):
         for node in nodes:
             for arg in node.args:
-                self.id_to_node[arg].ccpar.append(node.node_id)
+                self.id_to_node[arg].ccpar.add(node.node_id)
 
     def parse(self):
         expr = self.script.get_strict_formula().serialize()
