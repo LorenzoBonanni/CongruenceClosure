@@ -74,6 +74,8 @@ class Parser:
 
     def parse(self):
         expr = self.script.get_strict_formula().serialize()
+        result = [cmd for cmd in self.script.commands if ((cmd.name == "set-info") and (":status" in cmd.args))]
+        ground_truth = result[0].args[1]
         expr = self.smt_to_sympy_string(expr)
         # convert string expression into sympy object
         expr = parse_expr(expr, evaluate=False)
@@ -89,4 +91,4 @@ class Parser:
             plot_nodes(self.id_to_node)
         print(f"DNF EXPRESSION:\n{dnf_expr}")
 
-        return dnf_expr, nodes, dict_created_formulas
+        return dnf_expr, nodes, dict_created_formulas, ground_truth

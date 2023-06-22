@@ -1,4 +1,8 @@
+matplotlib==3.7.1
+more_itertools==9.1.0
+natsort==8.4.0
+networkx==3.1
+numpy==1.25.0
+pandas==2.0.2
 PySMT==0.9.5
-sympy~=1.12
-networkx~=3.1
-graphviz~=0.20.1
+sympy==1.12
