@@ -40,11 +40,11 @@ if __name__ == '__main__':
                    "\t1. Place the SMT files into a directory and then insert the relative path below\n" \
                    "\t\tExample: ./ar_inputs\n" \
                    "\t2. List all the files relative paths below followed by a space\n" \
-                   "\t\tExample: ./ar_inputs/input1.smt ./ar_inputs/input2.smt\n" \
+                   "\t\tExample: ./ar_inputs/input1.smt2 ./ar_inputs/input2.smt2\n" \
                    "* If you want to test the algorithm on the bundled examples follow the procedure described before " \
                    "and insert `./ar_inputs` as directory\n" \
                    "* If you want to test the code only on one equation input the smt file relative paths below\n" \
-                   "\tExample: ./ar_inputs/input1.smt\n\n" \
+                   "\tExample: ./ar_inputs/input1.smt2\n\n" \
                    "INPUT: "
     choice = input(input_phrase)
     concurrent = input("Number of parallel Executions? [-1 all cores] ")
@@ -70,8 +70,8 @@ if __name__ == '__main__':
     for batch in batches:
         processes = []
         for f in batch:
-            # args = f'./congruenceClosure {f}{flag}'
-            args = f'python main.py {f}{flag}'
+            args = f'./congruenceClosure {f}{flag}'
+            # args = f'python main.py {f}{flag}'
             p = subprocess.Popen(args, shell=True)
             processes.append(p)
         for pe in processes:
