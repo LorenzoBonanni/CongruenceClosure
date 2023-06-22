@@ -1,11 +1,9 @@
 import re
 from dataclasses import dataclass
 
-import networkx as nx
 from pysmt.smtlib.parser import SmtLibParser
 from sympy import parse_expr
 from sympy.core.function import Function
-from sympy.core.relational import Equality, Unequality
 from sympy.core.symbol import Symbol
 from sympy.logic.boolalg import *
 
@@ -26,19 +24,20 @@ class Node:
 
 
 class Parser:
-    def __init__(self, path: str):
+    def __init__(self, path: str, plots: bool):
         self.smt_parser = SmtLibParser()
         self.script = self.smt_parser.get_script_fname(path)
         self.id_to_node = {}
+        self.plots = plots
 
     def replace_ineq(self, text):
         idx_negative = re.finditer('!', text)
-        new_str = text
+        new_str = text[:]
         for idx in idx_negative:
             pos = idx.start()
-            sub = text[pos:]
+            sub = new_str[pos:]
             eq_shift = sub.find('=')
-            new_str = text[:pos + eq_shift] + '!=' + text[pos + eq_shift + 1:]
+            new_str = new_str[:pos + eq_shift] + '!=' + new_str[pos + eq_shift + 1:]
             new_str = new_str[:pos] + new_str[pos + 1:]
         return new_str
 
@@ -79,12 +78,15 @@ class Parser:
         # convert string expression into sympy object
         expr = parse_expr(expr, evaluate=False)
         print(f"INPUT EXPRESSION:\n{expr}")
-        dnf_expr = to_cnf(expr)
+        dnf_expr = expr
+        if not is_dnf(expr):
+            dnf_expr = to_dnf(expr)
         atoms = dnf_expr.atoms(Function, Symbol)
         dict_created_formulas = self.generate_dag(atoms)
         nodes = list(self.id_to_node.values())
         self.populate_ccpar(nodes)
-        plot_nodes(self.id_to_node)
+        if self.plots:
+            plot_nodes(self.id_to_node)
         print(f"DNF EXPRESSION:\n{dnf_expr}")
 
         return dnf_expr, nodes, dict_created_formulas

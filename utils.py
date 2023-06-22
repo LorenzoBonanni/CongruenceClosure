@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import networkx as nx
 import numpy as np
 from matplotlib import pyplot as plt
@@ -16,6 +18,13 @@ def get_positive_negative_subsets(equation, dict_created_formulas):
         else:
             f_minus.append(arguments)
     return f_plus, f_minus
+
+
+def print_and_write(text, path):
+    print(text)
+    file = 'outputs/' + Path(path).stem + '.out'
+    with open(file, 'w') as f:
+        f.write(text)
 
 
 def plot_nodes(id_to_node):
@@ -45,4 +54,5 @@ def plot_nodes(id_to_node):
             labels=labels,
             arrows=True
             )
+    plt.title("Equation DAG")
     plt.show()

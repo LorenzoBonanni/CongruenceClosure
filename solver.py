@@ -1,5 +1,8 @@
 import itertools
 
+from parser import Parser
+from utils import get_positive_negative_subsets, print_and_write
+
 
 class CongruenceClosureAlgorithm:
     def __init__(self, id_to_node, f_plus, f_minus):
@@ -16,14 +19,16 @@ class CongruenceClosureAlgorithm:
     def union(self, id1, id2):
         n1 = self.id_to_node[self.find(id1)]
         n2 = self.id_to_node[self.find(id2)]
-        n1.find_id = n2.find_id
+
         # delete the one with largest ccpar
-        if len(n1.ccpar) < len(n2.ccpar):
+        if len(n2.ccpar) > len(n1.ccpar):
+            n1.find_id = n2.find_id
+            n2.ccpar = n2.ccpar.union(n1.ccpar)
+            n1.ccpar = set()
+        else:
+            n2.find_id = n1.find_id
             n1.ccpar = n1.ccpar.union(n2.ccpar)
             n2.ccpar = set()
-        else:
-            n2.ccpar = n1.ccpar.union(n2.ccpar)
-            n1.ccpar = set()
 
     def ccpar(self, id1):
         return self.id_to_node[self.find(id1)].ccpar
@@ -46,6 +51,8 @@ class CongruenceClosureAlgorithm:
 
     def solve(self):
         for s_i, t_i in self.f_plus:
+            if (s_i, t_i) in self.f_minus or (t_i, s_i) in self.f_minus:
+                return "UNSAT (Forbiddend List)"
             self.merge(s_i, t_i)
         for s_i, t_i in self.f_minus:
             if self.find(s_i) == self.find(t_i):
